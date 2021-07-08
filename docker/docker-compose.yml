@@ -1,57 +1,65 @@
 version: '3'
 services:
+
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3
-    container_name: elasticsearch
+    image: elasticsearch:7.12.0
     environment:
-      - "http.host=0.0.0.0"
-      - "transport.host=127.0.0.1"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    networks:
-      - elk
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - cluster.name=elasticsearch
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - cluster.routing.allocation.disk.threshold_enabled=false
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=PassW0rd
+        #      - discovery.type=single-node
+        #      - xpack.security.audit.enabled=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks: ['stack']
+
+    #  apm-server:
+    #image: docker.elastic.co/apm/apm-server:7.12.0
+    #container_name: apm-server
+    #ports:
+    #  - 8200:8200
+    #volumes:
+    #  - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
+    #networks:
+    #  - stack
+    #depends_on:
+    #  - elasticsearch
+
+
+    #  logstash:
+    #image: antonionovaesjr/logstash-aws-es:7.12.1-beta
+    # environment:
+    #   - ELASTICSEARCH_USERNAME=logstash_internal
+    #   - ELASTICSEARCH_PASSWORD=logstash123
+    #ports:
+    #  - 9600:9600
+    #  - 5044:5044
+    #volumes:
+    #  - ./logstash.yml:/usr/share/logstash/config/logstash.yml
+    #  - ./logstash-elastic.conf:/usr/share/logstash/pipeline/logstash.conf
+    #networks: ['stack']
+    #depends_on: ['elasticsearch']
+
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.8.3
-    container_name: kibana
-    ports:
-      - 5601:5601
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
-
-  apm-server:
-    image: docker.elastic.co/apm/apm-server:6.8.3
-    container_name: apm-server
-    ports:
-      - 8200:8200
-    volumes:
-      - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
-
-  #beats:
-  #  image: docker.elastic.co/beats/metricbeat:6.8.3
-  #  command:
-  #    - "-system.hostfs=/hostfs"
-  #  container_name: beats
-  #  user: root
-  #  volumes:
-  #    - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
-  #    - /proc:/hostfs/proc:ro
-  #    - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
-  #    - /:/hostfs:ro
-  #    - /var/run/docker.sock:/var/run/docker.sock
-  #  networks:
-  #    - elk
-  #  depends_on:
-  #    - elasticsearch
-
-volumes:
-  esdata:
+    image: kibana:7.12.0
+    ports: ['5601:5601']
+    environment:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=PassW0rd
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    networks: ['stack']
+    links: ['elasticsearch']
+    depends_on: ['elasticsearch']
 
 networks:
-  elk:
+  stack: {}
