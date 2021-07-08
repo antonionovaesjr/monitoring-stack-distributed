@@ -4,5 +4,7 @@ apm-server:
 output:
   elasticsearch:
     hosts: elasticsearch:9200
+    username: elastic
+    password: PassW0rd
 
 setup.kibana.host: "kibana:5601"

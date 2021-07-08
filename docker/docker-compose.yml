@@ -22,17 +22,17 @@ services:
       - 9300:9300
     networks: ['stack']
 
-    #  apm-server:
-    #image: docker.elastic.co/apm/apm-server:7.12.0
-    #container_name: apm-server
-    #ports:
-    #  - 8200:8200
-    #volumes:
-    #  - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
-    #networks:
-    #  - stack
-    #depends_on:
-    #  - elasticsearch
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:7.12.0
+    container_name: apm-server
+    ports:
+      - 8200:8200
+    volumes:
+      - ./apm-server.yml:/usr/share/apm-server/apm-server.yml
+    networks:
+      - stack
+    depends_on:
+      - elasticsearch
 
 
     #  logstash:
