@@ -35,14 +35,13 @@ services:
       - elasticsearch
 
 
-    #  logstash:
-    #image: antonionovaesjr/logstash-aws-es:7.12.1-beta
-    # environment:
-    #   - ELASTICSEARCH_USERNAME=logstash_internal
-    #   - ELASTICSEARCH_PASSWORD=logstash123
-    #ports:
-    #  - 9600:9600
-    #  - 5044:5044
+        #logstash:
+        #image: docker.elastic.co/logstash/logstash:7.13.3
+        #environment:
+        #- ELASTICSEARCH_USERNAME=elastic
+        #- ELASTICSEARCH_PASSWORD=PassW0rd
+        #ports:
+        #- 5044:5044
     #volumes:
     #  - ./logstash.yml:/usr/share/logstash/config/logstash.yml
     #  - ./logstash-elastic.conf:/usr/share/logstash/pipeline/logstash.conf
