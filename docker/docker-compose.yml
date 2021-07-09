@@ -3,14 +3,15 @@ services:
 
   elasticsearch:
     image: elasticsearch:7.12.0
+    restart: unless-stopped
     environment:
       - bootstrap.memory_lock=true
       - discovery.type=single-node
       - cluster.name=elasticsearch
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
       - cluster.routing.allocation.disk.threshold_enabled=false
-      - xpack.security.enabled=true
-      - ELASTIC_PASSWORD=PassW0rd
+        #- ixpack.security.enabled=true
+        #- ELASTIC_PASSWORD=PassW0rd
         #      - discovery.type=single-node
         #      - xpack.security.audit.enabled=true
     ulimits:
@@ -25,6 +26,7 @@ services:
   apm-server:
     image: docker.elastic.co/apm/apm-server:7.12.0
     container_name: apm-server
+    restart: unless-stopped
     ports:
       - 8200:8200
     volumes:
@@ -37,9 +39,10 @@ services:
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.12.0
-    environment:
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=PassW0rd
+    restart: unless-stopped
+    #environment:
+            #- ELASTICSEARCH_USERNAME=elastic
+            #- ELASTICSEARCH_PASSWORD=PassW0rd
     ports:
       - 5044:5044
     volumes:
@@ -52,13 +55,29 @@ services:
   kibana:
     image: kibana:7.12.0
     ports: ['5601:5601']
-    environment:
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=PassW0rd
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    restart: unless-stopped
+    #environment:
+    #- ELASTICSEARCH_USERNAME=elastic
+    #- ELASTICSEARCH_PASSWORD=PassW0rd
+    #- ELASTICSEARCH_URL=http://elasticsearch:9200
     networks: ['stack']
     links: ['elasticsearch']
     depends_on: ['elasticsearch']
+
+  grafana:
+    image: grafana/grafana:8.0.5-ubuntu
+    container_name: monitoring_grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    links: ['elasticsearch']
+    depends_on: ['elasticsearch']
+    networks: ['stack']
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=PassW0rd
+      - GF_USERS_ALLOW_SIGN_UP=false
 
 networks:
   stack: {}
