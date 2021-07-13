@@ -78,6 +78,8 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=PassW0rd
       - GF_USERS_ALLOW_SIGN_UP=false
+      -  GF_AUTH_ANONYMOUS_ENABLED=true
+      - "GF_INSTALL_PLUGINS=grafana-worldmap-panel"
 
 networks:
   stack: {}
